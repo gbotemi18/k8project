@@ -1,0 +1,111 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ip-reversal-alerts
+  namespace: monitoring
+  labels:
+    app: ip-reversal-app
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: ip-reversal-app
+    rules:
+    # Application Down Alert
+    - alert: IPReversalAppDown
+      expr: up{job="ip-reversal-app"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        app: ip-reversal-app
+      annotations:
+        summary: "IP Reversal Application is down"
+        description: "The IP Reversal application has been down for more than 1 minute"
+        runbook_url: "https://github.com/your-username/ip-reversal-app/docs/troubleshooting.md"
+    
+    # High Error Rate Alert
+    - alert: IPReversalHighErrorRate
+      expr: rate(http_requests_total{job="ip-reversal-app", status=~"5.."}[5m]) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+        app: ip-reversal-app
+      annotations:
+        summary: "High error rate detected"
+        description: "Error rate is {{ $value }} errors per second"
+    
+    # High Response Time Alert
+    - alert: IPReversalHighResponseTime
+      expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="ip-reversal-app"}[5m])) > 1
+      for: 2m
+      labels:
+        severity: warning
+        app: ip-reversal-app
+      annotations:
+        summary: "High response time detected"
+        description: "95th percentile response time is {{ $value }} seconds"
+    
+    # Database Connection Issues
+    - alert: IPReversalDatabaseConnectionFailed
+      expr: up{job="ip-reversal-app"} == 1 and rate(http_requests_total{job="ip-reversal-app", status="500"}[5m]) > 0.05
+      for: 1m
+      labels:
+        severity: critical
+        app: ip-reversal-app
+      annotations:
+        summary: "Database connection issues detected"
+        description: "High rate of 500 errors, possible database connectivity issues"
+    
+    # Memory Usage Alert
+    - alert: IPReversalHighMemoryUsage
+      expr: (container_memory_usage_bytes{container="ip-reversal-app"} / container_spec_memory_limit_bytes{container="ip-reversal-app"}) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+        app: ip-reversal-app
+      annotations:
+        summary: "High memory usage"
+        description: "Memory usage is {{ $value | humanizePercentage }}"
+    
+    # CPU Usage Alert
+    - alert: IPReversalHighCPUUsage
+      expr: (rate(container_cpu_usage_seconds_total{container="ip-reversal-app"}[5m]) * 100) > 80
+      for: 5m
+      labels:
+        severity: warning
+        app: ip-reversal-app
+      annotations:
+        summary: "High CPU usage"
+        description: "CPU usage is {{ $value }}%"
+    
+    # Pod Restart Alert
+    - alert: IPReversalPodRestarting
+      expr: increase(kube_pod_container_status_restarts_total{container="ip-reversal-app"}[15m]) > 2
+      labels:
+        severity: warning
+        app: ip-reversal-app
+      annotations:
+        summary: "Pod is restarting frequently"
+        description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in the last 15 minutes"
+    
+    # Blackbox Exporter - Application Health Check
+    - alert: IPReversalHealthCheckFailed
+      expr: probe_success{job="blackbox", instance=~".*ip-reversal.*"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        app: ip-reversal-app
+      annotations:
+        summary: "Application health check failed"
+        description: "Health check for {{ $labels.instance }} is failing"
+    
+    # Blackbox Exporter - Response Time
+    - alert: IPReversalHealthCheckSlow
+      expr: probe_duration_seconds{job="blackbox", instance=~".*ip-reversal.*"} > 2
+      for: 2m
+      labels:
+        severity: warning
+        app: ip-reversal-app
+      annotations:
+        summary: "Application health check is slow"
+        description: "Health check for {{ $labels.instance }} is taking {{ $value }} seconds" 

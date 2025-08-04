@@ -1,0 +1,16 @@
+apiVersion: v2
+name: ip-reversal-app
+description: A Helm chart for the IP Reversal Web Application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - ip-reversal
+  - fastapi
+  - postgresql
+home: https://github.com/your-username/ip-reversal-app
+sources:
+  - https://github.com/your-username/ip-reversal-app
+maintainers:
+  - name: Your Name
+    email: your.email@example.com 
