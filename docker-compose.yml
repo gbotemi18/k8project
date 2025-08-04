@@ -3,9 +3,9 @@ services:
     image: postgres:15-alpine
     container_name: ip_reversal_db
     environment:
-      POSTGRES_DB: ip_reversal_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+      POSTGRES_USER: mydbuser
+      POSTGRES_PASSWORD: mypass
     ports:
       - "5432:5432"
     volumes:
