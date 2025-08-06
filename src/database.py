@@ -11,10 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Create database engine
 engine = create_engine(
-    settings.database_url,
-    echo=settings.debug,
-    pool_pre_ping=True,
-    pool_recycle=300
+    settings.database_url, echo=settings.debug, pool_pre_ping=True, pool_recycle=300
 )
 
 # Create session factory
@@ -26,14 +23,15 @@ Base = declarative_base()
 
 class IPAddress(Base):
     """Model for storing IP addresses"""
+
     __tablename__ = "ip_addresses"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     original_ip = Column(String(45), nullable=False, index=True)  # IPv6 compatible
     reversed_ip = Column(String(45), nullable=False, index=True)
     user_agent = Column(Text, nullable=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now(), index=True)
-    
+
     def __repr__(self):
         return f"<IPAddress(original_ip='{self.original_ip}', reversed_ip='{self.reversed_ip}')>"
 
@@ -54,4 +52,4 @@ def init_db():
         logger.info("Database tables created successfully")
     except Exception as e:
         logger.error(f"Error creating database tables: {e}")
-        raise 
+        raise
