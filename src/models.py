@@ -5,6 +5,7 @@ from datetime import datetime
 
 class IPAddressResponse(BaseModel):
     """Response model for IP address information"""
+
     original_ip: str = Field(..., description="Original IP address")
     reversed_ip: str = Field(..., description="Reversed IP address")
     version: str = Field(..., description="IP version (IPv4 or IPv6)")
@@ -19,6 +20,7 @@ class IPAddressResponse(BaseModel):
 
 class IPAddressHistory(BaseModel):
     """Model for IP address history entry"""
+
     id: int = Field(..., description="Database record ID")
     original_ip: str = Field(..., description="Original IP address")
     reversed_ip: str = Field(..., description="Reversed IP address")
@@ -28,12 +30,16 @@ class IPAddressHistory(BaseModel):
 
 class IPAddressHistoryResponse(BaseModel):
     """Response model for IP address history"""
+
     total_count: int = Field(..., description="Total number of records")
-    records: List[IPAddressHistory] = Field(..., description="List of IP address records")
+    records: List[IPAddressHistory] = Field(
+        ..., description="List of IP address records"
+    )
 
 
 class ErrorResponse(BaseModel):
     """Error response model"""
+
     error: str = Field(..., description="Error message")
     detail: Optional[str] = Field(None, description="Detailed error information")
     timestamp: datetime = Field(..., description="Error timestamp")
@@ -41,7 +47,8 @@ class ErrorResponse(BaseModel):
 
 class HealthCheckResponse(BaseModel):
     """Health check response model"""
+
     status: str = Field(..., description="Service status")
     version: str = Field(..., description="Application version")
     timestamp: datetime = Field(..., description="Health check timestamp")
-    database_status: str = Field(..., description="Database connection status") 
+    database_status: str = Field(..., description="Database connection status")

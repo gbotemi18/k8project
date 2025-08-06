@@ -2,6 +2,7 @@ import ipaddress
 from typing import Optional
 import re
 
+
 def reverse_ip_address(ip_str: str) -> str:
     """
     Reverse an IP address (IPv4 or IPv6).
@@ -20,12 +21,14 @@ def reverse_ip_address(ip_str: str) -> str:
     except ValueError as e:
         raise ValueError(f"Invalid IP address: {ip_str}") from e
 
+
 def is_valid_ip(ip_str: str) -> bool:
     try:
         ipaddress.ip_address(ip_str)
         return True
     except ValueError:
         return False
+
 
 def get_client_ip(request) -> str:
     """
@@ -43,9 +46,14 @@ def get_client_ip(request) -> str:
     client_ip = request.headers.get("X-Client-IP")
     if client_ip and is_valid_ip(client_ip):
         return client_ip
-    if hasattr(request, "client") and request.client and is_valid_ip(request.client.host):
+    if (
+        hasattr(request, "client")
+        and request.client
+        and is_valid_ip(request.client.host)
+    ):
         return request.client.host
     return "127.0.0.1"
+
 
 def format_ip_display(ip_str: str) -> dict:
     try:

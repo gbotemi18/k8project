@@ -21,7 +21,7 @@ app = FastAPI(
     version=settings.app_version,
     description="A web application that reverses IP addresses and stores them in a database",
     docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    redoc_url="/api/redoc",
 )
 
 # Templates for web interface
@@ -47,21 +47,23 @@ async def web_interface(request: Request, db: Session = Depends(get_db)):
         user_agent = request.headers.get("User-Agent")
         ip_info = IPAddressService.process_ip_request(db, client_ip, user_agent)
         stats = IPAddressService.get_statistics(db)
-        
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "ip_info": ip_info,
-            "stats": stats,
-            "app_name": settings.app_name,
-            "app_version": settings.app_version
-        })
+
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "ip_info": ip_info,
+                "stats": stats,
+                "app_name": settings.app_name,
+                "app_version": settings.app_version,
+            },
+        )
     except Exception as e:
         logger.error(f"Error in web interface: {e}")
-        return templates.TemplateResponse("error.html", {
-            "request": request,
-            "error": str(e),
-            "app_name": settings.app_name
-        })
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "error": str(e), "app_name": settings.app_name},
+        )
 
 
 @app.get("/api/ip", response_model=IPAddressResponse)
@@ -81,7 +83,7 @@ async def get_reversed_ip(request: Request, db: Session = Depends(get_db)):
 async def get_ip_history(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get IP address history"""
     try:
@@ -112,7 +114,7 @@ async def health_check(db: Session = Depends(get_db)):
             status="healthy" if db_status == "healthy" else "unhealthy",
             version=settings.app_version,
             timestamp=datetime.utcnow(),
-            database_status=db_status
+            database_status=db_status,
         )
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -120,5 +122,5 @@ async def health_check(db: Session = Depends(get_db)):
             status="unhealthy",
             version=settings.app_version,
             timestamp=datetime.utcnow(),
-            database_status="unhealthy"
-        ) 
+            database_status="unhealthy",
+        )
