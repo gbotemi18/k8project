@@ -63,6 +63,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: write
 
     steps:
     - name: Checkout code
@@ -114,7 +115,9 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/development'
-    
+    permissions:
+      contents: read
+      security-events: write    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
