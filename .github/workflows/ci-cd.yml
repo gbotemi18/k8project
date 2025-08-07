@@ -153,8 +153,20 @@ jobs:
 
     - name: Configure kubectl
       run: |
+        # Check if the secret is set
+        if [ -z "${{ secrets.KUBE_CONFIG_STAGING }}" ]; then
+          echo "ERROR: KUBE_CONFIG_STAGING secret is not set."
+          exit 1
+        fi
+        # Decode and write kubeconfig
         echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > kubeconfig
         export KUBECONFIG=kubeconfig
+        # Validate kubeconfig file
+        if ! grep -q 'apiVersion:' kubeconfig; then
+          echo "ERROR: Decoded kubeconfig is invalid or not properly base64-encoded."
+          exit 1
+        fi
+        echo "KUBECONFIG successfully configured."
 
     - name: Deploy to staging
       run: |
