@@ -135,6 +135,7 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
+
   deploy-staging:
     needs: [build-and-push, security-scan]
     runs-on: ubuntu-latest
@@ -171,10 +172,21 @@ jobs:
       run: |
         # Wait for deployment to be ready
         kubectl wait --for=condition=available --timeout=300s deployment/ip-reversal-staging -n staging
-        
-        # Get service URL
-        SERVICE_URL=$(kubectl get svc ip-reversal-staging -n staging -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-        
+
+        # Wait for external IP
+        for i in {1..30}; do
+          SERVICE_URL=$(kubectl get svc ip-reversal-staging -n staging -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          if [ -n "$SERVICE_URL" ]; then break; fi
+          echo 'Waiting for service external IP...'
+          sleep 10
+        done
+
+        if [ -z "$SERVICE_URL" ]; then
+          echo "ERROR: Service external IP not assigned after waiting."
+          kubectl describe svc ip-reversal-staging -n staging
+          exit 1
+        fi
+
         # Test health endpoint
         curl -f http://$SERVICE_URL/api/health
 
@@ -215,9 +227,20 @@ jobs:
         # Wait for deployment to be ready
         kubectl wait --for=condition=available --timeout=300s deployment/ip-reversal -n production
         
-        # Get service URL
-        SERVICE_URL=$(kubectl get svc ip-reversal -n production -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-        
+        # Wait for external IP
+        for i in {1..30}; do
+          SERVICE_URL=$(kubectl get svc ip-reversal -n production -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          if [ -n "$SERVICE_URL" ]; then break; fi
+          echo 'Waiting for service external IP...'
+          sleep 10
+        done
+
+        if [ -z "$SERVICE_URL" ]; then
+          echo "ERROR: Service external IP not assigned after waiting."
+          kubectl describe svc ip-reversal -n production
+          exit 1
+        fi
+
         # Test all endpoints
         curl -f http://$SERVICE_URL/api/health
         curl -f http://$SERVICE_URL/api/ip
@@ -227,4 +250,4 @@ jobs:
       if: success()
       run: |
         echo "🚀 Production deployment successful!"
-        echo "Service URL: http://$SERVICE_URL" 
+        echo "Service URL: http://$SERVICE_URL"
