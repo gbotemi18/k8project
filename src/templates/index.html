@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ app_name }} - IP Reversal Service</title>
     <style>
+        :root {
+            --gradient: linear-gradient(135deg, #dff7ff 0%, #9edcff 100%);
+            --accent-1: #1d9bf0;
+            --accent-2: #0ea5e9;
+            --surface: #ffffff;
+            --surface-muted: #f0f9ff;
+            --surface-muted-alt: #e0f2fe;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-inverted: #0f172a;
+            --shadow: rgba(15,118,168,0.25);
+            --card-border: rgba(14,165,233,0.15);
+            --toggle-bg: rgba(255,255,255,0.55);
+            --toggle-icon: #0f172a;
+        }
+
+        [data-theme="dark"] {
+            --gradient: linear-gradient(135deg, #0f1f3a 0%, #0b2647 100%);
+            --accent-1: #38bdf8;
+            --accent-2: #0ea5e9;
+            --surface: rgba(15,23,42,0.8);
+            --surface-muted: rgba(15,76,117,0.3);
+            --surface-muted-alt: rgba(14,116,144,0.35);
+            --text-primary: #e0f2fe;
+            --text-secondary: #94a3b8;
+            --text-inverted: #e0f2fe;
+            --shadow: rgba(3,105,161,0.45);
+            --card-border: rgba(56,189,248,0.35);
+            --toggle-bg: rgba(15,23,42,0.6);
+            --toggle-icon: #38bdf8;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,9 +45,10 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-primary);
+            transition: background 0.4s ease, color 0.4s ease;
         }
         
         .container {
@@ -27,7 +60,7 @@
         .header {
             text-align: center;
             margin-bottom: 40px;
-            color: white;
+            color: var(--text-inverted);
         }
         
         .header h1 {
@@ -49,10 +82,11 @@
         }
         
         .card {
-            background: white;
+            background: var(--surface);
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--card-border);
             transition: transform 0.3s ease;
         }
         
@@ -66,14 +100,14 @@
         
         .ip-label {
             font-size: 1.2rem;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 10px;
         }
         
         .original-ip {
             font-size: 2rem;
             font-weight: bold;
-            color: #667eea;
+            color: var(--accent-1);
             margin-bottom: 20px;
             word-break: break-all;
         }
@@ -81,7 +115,7 @@
         .reversed-ip {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #764ba2;
+            color: var(--accent-2);
             margin-bottom: 20px;
             word-break: break-all;
         }
@@ -96,20 +130,20 @@
         .info-item {
             text-align: center;
             padding: 15px;
-            background: #f8f9fa;
+            background: var(--surface-muted);
             border-radius: 10px;
         }
         
         .info-label {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 5px;
         }
         
         .info-value {
             font-size: 1.1rem;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
         }
         
         .stats-grid {
@@ -119,8 +153,8 @@
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: #ffffff;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
@@ -138,15 +172,16 @@
         }
         
         .api-section {
-            background: white;
+            background: var(--surface);
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--card-border);
             margin-bottom: 30px;
         }
         
         .api-section h3 {
-            color: #667eea;
+            color: var(--accent-2);
             margin-bottom: 20px;
             font-size: 1.5rem;
         }
@@ -157,21 +192,21 @@
         }
         
         .endpoint {
-            background: #f8f9fa;
+            background: var(--surface-muted);
             padding: 15px;
             border-radius: 10px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid var(--accent-1);
         }
         
         .endpoint-method {
             font-weight: bold;
-            color: #667eea;
+            color: var(--accent-1);
             margin-bottom: 5px;
         }
         
         .endpoint-url {
             font-family: monospace;
-            background: #e9ecef;
+            background: var(--surface-muted-alt);
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 0.9rem;
@@ -179,9 +214,36 @@
         
         .footer {
             text-align: center;
-            color: white;
+            color: var(--text-inverted);
             margin-top: 40px;
             opacity: 0.8;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--toggle-bg);
+            color: var(--toggle-icon);
+            border: none;
+            border-radius: 999px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
         }
         
         @media (max-width: 768px) {
@@ -204,6 +266,22 @@
     </style>
 </head>
 <body>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle color theme">
+        <span id="themeToggleIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+        </span>
+        <span id="themeToggleLabel">Light</span>
+    </button>
     <div class="container">
         <div class="header">
             <h1>{{ app_name }}</h1>
@@ -294,5 +372,52 @@
             <p>Version {{ app_version }} | Built with FastAPI and PostgreSQL</p>
         </div>
     </div>
+    <script>
+        const root = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        const toggleLabel = document.getElementById('themeToggleLabel');
+        const toggleIcon = document.getElementById('themeToggleIcon');
+        const sunIcon = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>`;
+        const moonIcon = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 0 0 12 17a7 7 0 0 0 9-4.21z"></path>
+            </svg>`;
+
+        const applyTheme = (theme) => {
+            root.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            const isDark = theme === 'dark';
+            toggleLabel.textContent = isDark ? 'Dark' : 'Light';
+            toggleIcon.innerHTML = isDark ? moonIcon : sunIcon;
+        };
+
+        const getPreferredTheme = () => {
+            const stored = localStorage.getItem('theme');
+            if (stored) return stored;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        applyTheme(getPreferredTheme());
+
+        toggleBtn.addEventListener('click', () => {
+            const nextTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+            applyTheme(event.matches ? 'dark' : 'light');
+        });
+    </script>
 </body>
 </html> 
